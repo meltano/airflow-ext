@@ -25,6 +25,17 @@ class ExtensionBase(metaclass=ABCMeta):
         """Called before the extension is invoked."""
         pass
 
+    def initialize(self, force: bool = False):
+        """Initialize the extension.
+
+        This method is called on-demand by the user to initialize the extension.
+        Extensions are not required to implement this method, and may no-op.
+
+        Args:
+            force: If True, force initialization.
+        """
+        pass
+
     @abstractmethod
     def invoke(self) -> None:
         """Invoke method.
