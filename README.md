@@ -23,7 +23,7 @@ meltano airflow webserver
   utilities:
   - name: airflow
     namespace: airflow
-    pip_url: git+https://github.com/pandemicsyn/airflow-extension.git apache-airflow==2.3.3
+    pip_url: git+https://github.com/meltano/ext-airflow.git apache-airflow==2.3.3
     executable: airflow_extension
     env:
       AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8080"
