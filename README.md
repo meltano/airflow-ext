@@ -23,7 +23,7 @@ meltano airflow webserver
   utilities:
   - name: airflow
     namespace: airflow
-    pip_url: git+https://github.com/meltano/ext-airflow.git apache-airflow==2.3.3
+    pip_url: git+https://github.com/meltano/ext-airflow.git@feat-init-extension apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
     executable: airflow_extension
     env:
       AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8080"
