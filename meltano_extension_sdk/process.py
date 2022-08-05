@@ -86,19 +86,18 @@ class Invoker:
 
     @staticmethod
     async def _log_stdio(
-        reader: asyncio.streams.StreamReader, source: str = "unspecified"
+        reader: asyncio.streams.StreamReader
     ) -> None:
         """Log the output of a stream.
 
         Args:
             reader: The stream reader to read from.
-            source: The value of the 'stdio_stream' key in log output.
         """
         while True:
             if reader.at_eof():
                 break
             data = await reader.readline()
-            log.info(data.decode("utf-8").rstrip(), stdio_stream=source)
+            log.info(data.decode("utf-8").rstrip())
             await asyncio.sleep(0)
 
     async def _exec(
@@ -113,8 +112,8 @@ class Invoker:
         p = await asyncio.create_subprocess_exec(
             self.bin, *popen_args, stdout=PIPE, stderr=PIPE, env=self.popen_env
         )
-        asyncio.create_task(self._log_stdio(p.stderr, "stderr"))
-        asyncio.create_task(self._log_stdio(p.stdout, "stdout"))
+        asyncio.create_task(self._log_stdio(p.stderr))
+        asyncio.create_task(self._log_stdio(p.stdout))
 
         await p.wait()
         return p
