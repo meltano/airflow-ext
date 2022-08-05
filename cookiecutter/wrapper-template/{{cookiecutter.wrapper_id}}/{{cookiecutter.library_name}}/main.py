@@ -102,10 +102,13 @@ def main(
     log_levels: bool = typer.Option(
         False, "--log-levels", envvar="LOG_LEVELS", help="Show log levels"
     ),
+    meltano_log_json: bool = typer.Option(
+        False, "--meltano-log-json", envvar="MELTANO_LOG_JSON", help="Log in the meltano JSON log format"
+    ),
 ):
     """
     Simple Meltano extension that wraps the {{ cookiecutter.wrapper_target_name }} CLI.
     """
     default_logging_config(
-        level=parse_log_level(log_level), timestamps=log_timestamps, levels=log_levels
+        level=parse_log_level(log_level), timestamps=log_timestamps, levels=log_levels, json_format=meltano_log_json
     )
