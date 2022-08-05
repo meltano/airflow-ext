@@ -39,8 +39,8 @@ class Airflow(ExtensionBase):
             )
             sys.exit(1)
         if not self.airflow_cfg_path.exists():
-            log.warning(
-                "airflow.cfg does not exist, will be auto-generated with defaults",
+            log.debug(
+                "airflow.cfg does not exist, will be auto-generated with defaults on first invoke call",
                 airflow_cfg_path=self.airflow_cfg_path,
             )
 

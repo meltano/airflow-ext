@@ -6,7 +6,6 @@ import structlog
 import typer
 
 from airflow_extension.airflow import Airflow
-
 from meltano_extension_sdk.extension import DescribeFormat
 from meltano_extension_sdk.logging import default_logging_config, parse_log_level
 
@@ -15,8 +14,9 @@ log = structlog.get_logger()
 APP_NAME: str = "airflow_extension"
 
 plugin = Airflow()
-app = typer.Typer(pretty_exceptions_enable=False)
 
+typer.core.rich = None # remove to enable stylized help output when `rich` is installed
+app = typer.Typer(pretty_exceptions_enable=False, rich_markup_mode=None)
 
 @app.command()
 def initialize(ctx: typer.Context, force: bool = False):
@@ -103,12 +103,18 @@ def main(
         False, "--log-levels", envvar="LOG_LEVELS", help="Show log levels"
     ),
     meltano_log_json: bool = typer.Option(
-        False, "--meltano-log-json", envvar="MELTANO_LOG_JSON", help="Log in the meltano JSON log format"
+        False,
+        "--meltano-log-json",
+        envvar="MELTANO_LOG_JSON",
+        help="Log in the meltano JSON log format",
     ),
 ):
     """
     Simple Meltano extension to wrap the airflow CLI.
     """
     default_logging_config(
-        level=parse_log_level(log_level), timestamps=log_timestamps, levels=log_levels, json_format=meltano_log_json
+        level=parse_log_level(log_level),
+        timestamps=log_timestamps,
+        levels=log_levels,
+        json_format=meltano_log_json,
     )
