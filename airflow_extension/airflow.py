@@ -32,18 +32,6 @@ class Airflow(ExtensionBase):
             sys.exit(1)
 
         self.airflow_cfg_path = Path(os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg"))
-        if not self.airflow_cfg_path:
-            log.debug("env dump", env=os.environ)
-            log.error(
-                "AIRFLOW_CONFIG not found in environment, unable to function without it"
-            )
-            sys.exit(1)
-        if not self.airflow_cfg_path.exists():
-            log.debug(
-                "airflow.cfg does not exist, will be auto-generated with defaults on first invoke call",
-                airflow_cfg_path=self.airflow_cfg_path,
-            )
-
         self.airflow_core_dags_path = Path(
             os.path.expandvars(
                 os.environ.get(
