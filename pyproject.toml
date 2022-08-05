@@ -13,7 +13,6 @@ packages = [
     { include = "airflow_extension" },
     { include = "files_airflow_ext"},
     { include = "meltano_extension_sdk" }
-
 ]
 
 include = [

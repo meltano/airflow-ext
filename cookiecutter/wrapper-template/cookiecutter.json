@@ -1,0 +1,8 @@
+{
+  "source_name": "MyExtensionName",
+  "admin_name": "FirstName LastName",
+  "extension_name": "{{ cookiecutter.source_name.lower() }}",
+  "wrapper_id": "ext-{{ cookiecutter.extension_name }}",
+  "library_name": "{{ cookiecutter.extension_name.replace('-', '_') }}_extension",
+  "wrapper_target_name": "some-third-party-cli"
+}
