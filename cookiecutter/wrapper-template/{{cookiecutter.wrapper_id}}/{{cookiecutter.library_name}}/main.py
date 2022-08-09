@@ -16,7 +16,7 @@ log = structlog.get_logger()
 
 APP_NAME: str = "{{ cookiecutter.source_name }}"
 
-plugin =  {{ cookiecutter.source_name }}()
+plugin = {{ cookiecutter.source_name }}()
 
 typer.core.rich = None # remove to enable stylized help output when `rich` is installed
 app = typer.Typer(pretty_exceptions_enable=False)
