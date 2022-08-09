@@ -35,4 +35,4 @@ packages = [
 #]
 
 [tool.poetry.scripts]
-{{cookiecutter.wrapper_id}} = '{{cookiecutter.library_name}}.main:app'
+{{cookiecutter.library_name}} = '{{cookiecutter.library_name}}.main:app'
