@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-import pkgutil
 import os
+import pkgutil
 import subprocess
 import sys
 from pathlib import Path
 
 import structlog
 
-from meltano_extension_sdk.extension import Description, ExtensionBase
+from meltano_extension_sdk import models
+from meltano_extension_sdk.extension import ExtensionBase
 from meltano_extension_sdk.process import Invoker, log_subprocess_error
 
-log = structlog.get_logger()
+log = structlog.get_logger("airflow_extension")
 
 
 class Airflow(ExtensionBase):
@@ -31,7 +32,9 @@ class Airflow(ExtensionBase):
             )
             sys.exit(1)
 
-        self.airflow_cfg_path = Path(os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg"))
+        self.airflow_cfg_path = Path(
+            os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg")
+        )
         self.airflow_core_dags_path = Path(
             os.path.expandvars(
                 os.environ.get(
@@ -81,9 +84,18 @@ class Airflow(ExtensionBase):
             )
             sys.exit(1)
 
-    def describe(self) -> Description:
-        # TODO: could we build this from typer instead?
-        return Description(commands=[":splat", "webserver", "scheduler", "version"])
+    def describe(self) -> models.Describe:
+        # TODO: could we auto-generate all or portions of this from typer instead?
+        return models.Describe(
+            commands=[
+                models.ExtensionCommand(
+                    name="airflow_extension", description="airflow extension commands"
+                ),
+                models.InvokerCommand(
+                    name="airflow_invoker", description="airflow pass through invoker"
+                ),
+            ]
+        )
 
     def _create_config(self):
         # create an initial airflow config file

@@ -85,9 +85,7 @@ class Invoker:
         )
 
     @staticmethod
-    async def _log_stdio(
-        reader: asyncio.streams.StreamReader
-    ) -> None:
+    async def _log_stdio(reader: asyncio.streams.StreamReader) -> None:
         """Log the output of a stream.
 
         Args:
@@ -95,9 +93,11 @@ class Invoker:
         """
         while True:
             if reader.at_eof():
+                log.info("breaking")
                 break
             data = await reader.readline()
             log.info(data.decode("utf-8").rstrip())
+            log.info("ok")
             await asyncio.sleep(0)
 
     async def _exec(

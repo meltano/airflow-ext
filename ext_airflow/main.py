@@ -5,30 +5,36 @@ from typing import List
 import structlog
 import typer
 
-from airflow_extension.airflow import Airflow
+from ext_airflow.airflow import Airflow
 from meltano_extension_sdk.extension import DescribeFormat
-from meltano_extension_sdk.logging import default_logging_config, parse_log_level
+from meltano_extension_sdk.logging import (default_logging_config,
+                                           parse_log_level)
 
-log = structlog.get_logger()
+log = structlog.get_logger("airflow_extension")
 
 APP_NAME: str = "airflow_extension"
 
-plugin = Airflow()
+ext = Airflow()
 
-typer.core.rich = None # remove to enable stylized help output when `rich` is installed
+typer.core.rich = None  # remove to enable stylized help output when `rich` is installed
 app = typer.Typer(pretty_exceptions_enable=False, rich_markup_mode=None)
 
+
 @app.command()
-def initialize(ctx: typer.Context, force: bool = False):
+def initialize(ctx: typer.Context, force: bool = False) -> None:
     """Initialize the plugin.
 
-    This will create the airflow.cfg, initialize the database, and install the meltano airflow dag generator.
+    This will create the airflow.cfg, initialize the database, and install the meltano
+    airflow dag generator.
+
+    Args:
+        force: If True, force initialization.
     """
     try:
-        plugin.initialize(force)
+        ext.initialize(force)
     except Exception:
         log.exception(
-            "initialize failed with uncaught exception, please report exception to maintainer"
+            "initialize failed with uncaught exception, please report to maintainer"
         )
         sys.exit(1)
 
@@ -36,11 +42,12 @@ def initialize(ctx: typer.Context, force: bool = False):
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
 )
-def invoke(ctx: typer.Context, command_args: List[str]):
-    """Invoke the plugin.
+def invoke(ctx: typer.Context, command_args: List[str]) -> None:
+    """Invoke the underlying wrapped cli.
 
     Note: that if a command argument is a list, such as command_args, then
-    unknown options are also included in the list and NOT stored in the context as usual.
+    unknown options are also included in the list and NOT stored in the context
+    as usual.
 
     Args:
         ctx: The typer.Context for this invocation
@@ -50,30 +57,7 @@ def invoke(ctx: typer.Context, command_args: List[str]):
     log.debug(
         "called", command_name=command_name, command_args=command_args, env=os.environ
     )
-
-    try:
-        plugin.pre_invoke()
-    except Exception:
-        log.exception(
-            "pre_invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
-
-    try:
-        plugin.invoke(command_name, command_args)
-    except Exception:
-        log.exception(
-            "invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
-
-    try:
-        plugin.post_invoke()
-    except Exception:
-        log.exception(
-            "ppost_invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
+    ext.pass_through_invoker(log, command_name, *command_args)
 
 
 @app.command()
@@ -81,13 +65,17 @@ def describe(
     output_format: DescribeFormat = typer.Option(
         DescribeFormat.text, "--format", help="Output format"
     )
-):
-    """Describe the available commands of this extension."""
+) -> None:
+    """Describe the available commands of this extension.
+
+    Args:
+        output_format: The output format to use.
+    """
     try:
-        typer.echo(plugin.describe_formatted(output_format))
+        typer.echo(ext.describe_formatted(output_format))
     except Exception:
         log.exception(
-            "describe failed with uncaught exception, please report exception to maintainer"
+            "describe failed with uncaught exception, please report to maintainer"
         )
         sys.exit(1)
 
@@ -111,6 +99,12 @@ def main(
 ):
     """
     Simple Meltano extension to wrap the airflow CLI.
+
+    Args:
+        log_level: The log level to use.
+        log_timestamps: Show timestamp in logs.
+        log_levels: Show log levels.
+        meltano_log_json: Log in the meltano JSON log format.
     """
     default_logging_config(
         level=parse_log_level(log_level),

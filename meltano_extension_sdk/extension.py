@@ -1,21 +1,20 @@
 """Meltano extension SDK base class and supporting methods."""
-import json
+from __future__ import annotations
+
+import sys
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import List
 
+import structlog
 import yaml
-from pydantic import BaseModel
+
+from meltano_extension_sdk import models
 
 
 class DescribeFormat(str, Enum):
     text = "text"
     json = "json"
     yaml = "yaml"
-
-
-class Description(BaseModel):
-    commands: List[str] = [":splat"]
 
 
 class ExtensionBase(metaclass=ABCMeta):
@@ -37,7 +36,7 @@ class ExtensionBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def invoke(self) -> None:
+    def invoke(self, command_name: str | None, *command_args) -> None:
         """Invoke method.
 
         This method is called when the extension is invoked.
@@ -49,7 +48,7 @@ class ExtensionBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def describe(self) -> Description:
+    def describe(self) -> models.Describe:
         """Describe method.
 
         This method should describe what commands & capabilities the extension provides.
@@ -70,14 +69,52 @@ class ExtensionBase(metaclass=ABCMeta):
         Returns:
             str: The formatted description.
         """
-
-        meltano_config = {}
-        for x in self.describe().commands:
-            meltano_config[x] = f"invoke {x}"
-
         if output_format == DescribeFormat.text:
-            return f"commands: {self.describe().commands}"
+            return f"{self.describe()}"
         elif output_format == DescribeFormat.json:
-            return json.dumps({"commands": meltano_config}, indent=2)
+            return self.describe().json(indent=2)
         elif output_format == DescribeFormat.yaml:
-            return yaml.dump({"commands": meltano_config})
+            return yaml.dump(self.describe().dict())
+
+    def pass_through_invoker(
+        self, logger: structlog.BoundLogger, command_name: str, *command_args
+    ) -> None:
+        """Pass-through invoker.
+
+        This method is used to invoke the wrapped CLI with arbitrary arguments.
+        Note this method will hard exit the process if an unhandled exception is
+        encountered.
+
+        Args:
+            logger: The logger to use in the event an exception needs to be logged.
+            command_name: The name of the command to invoke.
+            *command_args: The arguments to pass to the command.
+        """
+        logger.debug(
+            "pass through invoker called",
+            command_name=command_name,
+            command_args=command_args,
+        )
+        try:
+            self.pre_invoke()
+        except Exception:
+            logger.exception(
+                "pre_invoke failed with uncaught exception, please report to maintainer"
+            )
+            sys.exit(1)
+
+        try:
+            self.invoke(command_name, command_args)
+        except Exception:
+            logger.exception(
+                "invoke failed with uncaught exception, please report to maintainer"
+            )
+            sys.exit(1)
+
+        try:
+            self.post_invoke()
+        except Exception:
+            logger.exception(
+                "post_invoke failed with uncaught exception, please report to maintainer"
+            )
+            sys.exit(1)

@@ -10,7 +10,7 @@ repository = "https://github.com/meltano/ext-airflow"
 license = "Apache 2.0"
 
 packages = [
-    { include = "airflow_extension" },
+    { include = "ext_airflow" },
     { include = "files_airflow_ext"},
     { include = "meltano_extension_sdk" }
 ]
@@ -25,7 +25,6 @@ python = "^3.8"
 structlog = "^21.2.0"
 PyYAML = "^6.0.0"
 pydantic = "^1.9.0"
-click = "^8.1.3"
 typer = "^0.6.1"
 
 [tool.poetry.dev-dependencies]
@@ -39,4 +38,5 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-airflow_extension = 'airflow_extension.main:app'
+airflow_extension = 'ext_airflow.main:app'
+airflow_invoker = 'ext_airflow.pass_through:pass_through_cli'
