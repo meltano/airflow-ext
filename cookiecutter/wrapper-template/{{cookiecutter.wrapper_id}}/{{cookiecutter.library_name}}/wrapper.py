@@ -40,7 +40,6 @@ class {{ cookiecutter.source_name }}(ExtensionBase):
                 ),
                 models.InvokerCommand(
                     name="{{ cookiecutter.cli_prefix }}_invoker", description="pass through invoker"
-                    name="{{ cookiecutter.cli_prefix }}_invoker", description="pass through invoker"
                 ),
             ]
         )
