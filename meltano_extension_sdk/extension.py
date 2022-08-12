@@ -1,6 +1,7 @@
 """Meltano extension SDK base class and supporting methods."""
 from __future__ import annotations
 
+import json
 import sys
 from abc import ABCMeta, abstractmethod
 from enum import Enum
@@ -74,7 +75,11 @@ class ExtensionBase(metaclass=ABCMeta):
         elif output_format == DescribeFormat.json:
             return self.describe().json(indent=2)
         elif output_format == DescribeFormat.yaml:
-            return yaml.dump(self.describe().dict())
+            # just calling describe().dict() and dumping that to yaml yields a yaml that is subtly
+            # different to the json variant in that it you have an additional level of nesting.
+            return yaml.dump(
+                yaml.safe_load(self.describe().json()), sort_keys=False, indent=2
+            )
 
     def pass_through_invoker(
         self, logger: structlog.BoundLogger, command_name: str, *command_args
