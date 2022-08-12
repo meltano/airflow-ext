@@ -12,5 +12,5 @@ def pass_through_cli():
     pass_through_logging_config()
     ext = Airflow()
     ext.pass_through_invoker(
-        structlog.getLogger("airflow_invoker"), sys.argv[1], *sys.argv[2:]
+        structlog.getLogger("airflow_invoker"), *sys.argv[1:] if len(sys.argv) > 1 else []
     )

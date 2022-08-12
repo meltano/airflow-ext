@@ -93,11 +93,9 @@ class Invoker:
         """
         while True:
             if reader.at_eof():
-                log.info("breaking")
                 break
             data = await reader.readline()
             log.info(data.decode("utf-8").rstrip())
-            log.info("ok")
             await asyncio.sleep(0)
 
     async def _exec(

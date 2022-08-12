@@ -82,7 +82,7 @@ class ExtensionBase(metaclass=ABCMeta):
             )
 
     def pass_through_invoker(
-        self, logger: structlog.BoundLogger, command_name: str, *command_args
+        self, logger: structlog.BoundLogger, *command_args
     ) -> None:
         """Pass-through invoker.
 
@@ -92,12 +92,10 @@ class ExtensionBase(metaclass=ABCMeta):
 
         Args:
             logger: The logger to use in the event an exception needs to be logged.
-            command_name: The name of the command to invoke.
             *command_args: The arguments to pass to the command.
         """
         logger.debug(
             "pass through invoker called",
-            command_name=command_name,
             command_args=command_args,
         )
         try:
@@ -109,7 +107,7 @@ class ExtensionBase(metaclass=ABCMeta):
             sys.exit(1)
 
         try:
-            self.invoke(command_name, command_args)
+            self.invoke(None, command_args)
         except Exception:
             logger.exception(
                 "invoke failed with uncaught exception, please report to maintainer"
