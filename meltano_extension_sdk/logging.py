@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 
 import structlog
@@ -86,4 +87,21 @@ def default_logging_config(
         format="%(message)s",
         stream=sys.stderr,
         level=level,
+    )
+
+def pass_through_logging_config() -> None:
+    """Pass-through logging configuration.
+
+    Setups a logging config using the LOG_LEVEL, LOG_TIMESTAMPS, LOG_LEVELS, and MELTANO_LOG_JSON env vars.
+    """
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    log_timestamps = os.environ.get("LOG_TIMESTAMPS", False)
+    log_levels = os.environ.get("LOG_LEVELS", False)
+    meltano_log_json = os.environ.get("MELTANO_LOG_JSON", False)
+
+    default_logging_config(
+        level=parse_log_level(log_level),
+        timestamps=log_timestamps,
+        levels=log_levels,
+        json_format=meltano_log_json,
     )
