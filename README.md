@@ -73,3 +73,22 @@ meltano invoke airflow scheduler &
 meltano invoke airflow webserver 
 ```
 
+## Cookiecutter
+
+```shell
+# Create a new project
+$ cookiecutter cookiecutter/wrapper-template -o path/to/your/project
+source_name [MyExtensionName]: Airflow
+admin_name [FirstName LastName]: Bob Loblaw
+extension_name [airflow]:
+wrapper_id [ext-airflow]:
+library_name [ext_airflow]:
+cli_prefix [airflow]:
+wrapper_target_name [some-third-party-cli]: airflow
+```
+
+```shell
+cd path/to/your/project
+poetry install
+poetry run airflow_extension describe
+```

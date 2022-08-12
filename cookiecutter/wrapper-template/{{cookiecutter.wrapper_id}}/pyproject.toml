@@ -35,4 +35,5 @@ packages = [
 #]
 
 [tool.poetry.scripts]
-{{cookiecutter.library_name}} = '{{cookiecutter.library_name}}.main:app'
+{{cookiecutter.cli_prefix}}_extension = '{{cookiecutter.library_name}}.main:app'
+{{cookiecutter.cli_prefix}}_invoker = '{{cookiecutter.library_name}}.pass_through:pass_through_cli'

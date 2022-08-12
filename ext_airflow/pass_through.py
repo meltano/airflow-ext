@@ -1,9 +1,8 @@
-import os
 import sys
 
 import structlog
 
-from ext_airflow.airflow import Airflow
+from ext_airflow.wrapper import Airflow
 from meltano_extension_sdk.logging import pass_through_logging_config
 
 

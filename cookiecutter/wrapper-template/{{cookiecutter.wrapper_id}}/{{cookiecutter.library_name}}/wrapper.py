@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-import pkgutil
 import os
+import pkgutil
 import subprocess
 import sys
+from pathlib import Path
 
 import structlog
 
-from meltano_extension_sdk.extension import Description, ExtensionBase
+from meltano_extension_sdk import models
+from meltano_extension_sdk.extension import ExtensionBase
 from meltano_extension_sdk.process import Invoker, log_subprocess_error
 
 log = structlog.get_logger()
@@ -29,8 +31,16 @@ class {{ cookiecutter.source_name }}(ExtensionBase):
             )
             sys.exit(err.returncode)
 
-    def describe(self) -> Description:
-        """Return a description of the extension."""
-        # simply list what custom commands you'd like to make available
-        # or use ":splat" to indicate that you're extension supports wild card pass-through.
-        return Description(commands=[":splat"])
+    def describe(self) -> models.Describe:
+        # TODO: could we auto-generate all or portions of this from typer instead?
+        return models.Describe(
+            commands=[
+                models.ExtensionCommand(
+                    name="{{ cookiecutter.cli_prefix }}_extension", description="extension commands"
+                ),
+                models.InvokerCommand(
+                    name="{{ cookiecutter.cli_prefix }}_invoker", description="pass through invoker"
+                    name="{{ cookiecutter.cli_prefix }}_invoker", description="pass through invoker"
+                ),
+            ]
+        )

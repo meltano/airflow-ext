@@ -8,15 +8,15 @@ import structlog
 import typer
 
 from {{ cookiecutter.library_name }}.wrapper import {{ cookiecutter.source_name }}
-
 from meltano_extension_sdk.extension import DescribeFormat
-from meltano_extension_sdk.logging import default_logging_config, parse_log_level
-
-log = structlog.get_logger()
+from meltano_extension_sdk.logging import (default_logging_config,
+                                           parse_log_level)
 
 APP_NAME: str = "{{ cookiecutter.source_name }}"
 
-plugin = {{ cookiecutter.source_name }}()
+log = structlog.get_logger(APP_NAME)
+
+ext = {{ cookiecutter.source_name }}()
 
 typer.core.rich = None # remove to enable stylized help output when `rich` is installed
 app = typer.Typer(pretty_exceptions_enable=False)
@@ -26,10 +26,10 @@ app = typer.Typer(pretty_exceptions_enable=False)
 def initialize(ctx: typer.Context, force: bool = False):
     """Initialize the {{ cookiecutter.source_name }} plugin."""
     try:
-        plugin.initialize(force)
+        ext.initialize(force)
     except Exception:
         log.exception(
-            "initialize failed with uncaught exception, please report exception to maintainer"
+            "initialize failed with uncaught exception, please report to maintainer"
         )
         sys.exit(1)
 
@@ -51,30 +51,7 @@ def invoke(ctx: typer.Context, command_args: List[str]):
     log.debug(
         "called", command_name=command_name, command_args=command_args, env=os.environ
     )
-
-    try:
-        plugin.pre_invoke()
-    except Exception:
-        log.exception(
-            "pre_invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
-
-    try:
-        plugin.invoke(command_name, command_args)
-    except Exception:
-        log.exception(
-            "invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
-
-    try:
-        plugin.post_invoke()
-    except Exception:
-        log.exception(
-            "ppost_invoke failed with uncaught exception, please report exception to maintainer"
-        )
-        sys.exit(1)
+    ext.pass_through_invoker(log, command_name, *command_args)
 
 
 @app.command()
@@ -82,13 +59,17 @@ def describe(
     output_format: DescribeFormat = typer.Option(
         DescribeFormat.text, "--format", help="Output format"
     )
-):
-    """Describe the available commands of this extension."""
+) -> None:
+    """Describe the available commands of this extension.
+
+    Args:
+        output_format: The output format to use.
+    """
     try:
-        typer.echo(plugin.describe_formatted(output_format))
+        typer.echo(ext.describe_formatted(output_format))
     except Exception:
         log.exception(
-            "describe failed with uncaught exception, please report exception to maintainer"
+            "describe failed with uncaught exception, please report to maintainer"
         )
         sys.exit(1)
 
