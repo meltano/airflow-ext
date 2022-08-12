@@ -82,7 +82,7 @@ class Airflow(ExtensionBase):
             log_subprocess_error(
                 f"airflow {command_name}", err, "airflow invocation failed"
             )
-            sys.exit(1)
+            sys.exit(err.returncode)
 
     def describe(self) -> models.Describe:
         # TODO: could we auto-generate all or portions of this from typer instead?
@@ -105,7 +105,7 @@ class Airflow(ExtensionBase):
             log_subprocess_error(
                 "airflow --help", err, "initial airflow invocation failed"
             )
-            sys.exit(1)
+            sys.exit(err.returncode)
 
     def _initdb(self):
         """Initialize the airflow metadata database."""
@@ -113,4 +113,4 @@ class Airflow(ExtensionBase):
             self.airflow_invoker.run("db", "init")
         except subprocess.CalledProcessError as err:
             log_subprocess_error("airflow db init", err, "airflow db init failed")
-            sys.exit(1)
+            sys.exit(err.returncode)

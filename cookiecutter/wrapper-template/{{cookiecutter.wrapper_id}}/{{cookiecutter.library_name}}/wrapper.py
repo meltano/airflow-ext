@@ -27,7 +27,7 @@ class {{ cookiecutter.source_name }}(ExtensionBase):
             log_subprocess_error(
                 f"{{ cookiecutter.extension_name }} {command_name}", err, "{{ cookiecutter.extension_name }} invocation failed"
             )
-            sys.exit(1)
+            sys.exit(err.returncode)
 
     def describe(self) -> Description:
         """Return a description of the extension."""
