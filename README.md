@@ -75,6 +75,10 @@ meltano invoke airflow webserver
 
 ## Cookiecutter
 
+This repo is also the *temporary* location for the cookiecutter template for the meltano extension SDK.
+It will be moved to a more permanent location shortly. In the meantime, you can use the cookiecutter template to create
+a new extension
+
 ```shell
 # Create a new project
 $ cookiecutter cookiecutter/wrapper-template -o path/to/your/project
@@ -87,8 +91,24 @@ cli_prefix [airflow]:
 wrapper_target_name [some-third-party-cli]: airflow
 ```
 
+This will yield a project with the following structure (assuming the above vars are used):
+
+```shell
+$ tree
+.
+└── ext-airflow
+    ├── README.md
+    ├── ext_airflow
+    │   ├── __init__.py
+    │   ├── main.py
+    │   ├── pass_through.py
+    │   └── wrapper.py
+    └── pyproject.toml
+```
+
 ```shell
 cd path/to/your/project
 poetry install
-poetry run airflow_extension describe
+poetry run airflow_extension describe --format=yaml
+poetry run airflow_invoker --help # will return the airflow help assuming airflow is installed
 ```
