@@ -20,7 +20,7 @@ class Airflow(ExtensionBase):
 
         self.app_name = "airflow_extension"
         self.airflow_bin = "airflow"
-        self.airflow_invoker = Invoker(self.airflow_bin, env=os.environ.copy())
+        self.airflow_invoker = Invoker(self.airflow_bin)
 
         self.airflow_home = os.environ.get("AIRFLOW_HOME") or os.environ.get(
             f"{self.app_name}_AIRFLOW_HOME"

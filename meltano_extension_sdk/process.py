@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import subprocess
-from asyncio.subprocess import PIPE
+from typing import IO
 
 import structlog
 
@@ -34,7 +35,6 @@ class Invoker:
     def __init__(
         self,
         bin: str,
-        universal_newlines: bool = True,
         cwd: str = None,
         env: dict[str, any] | None = None,
     ):
@@ -42,17 +42,20 @@ class Invoker:
 
         Args:
             bin: The path/name of the binary to run.
-            universal_newlines: Whether to use universal newlines.
             cwd: The working directory to run from.
-            env: Env to use when calling Popen.
+            env: Env to use when calling Popen, defaults to current os.environ if None.
         """
         self.bin = bin
-        self.universal_newlines = universal_newlines
         self.cwd = cwd
-        self.popen_env = env
+        self.popen_env = env if env else os.environ.copy()
 
     def run(
-        self, *args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        self,
+        *args,
+        stdout: None | int | IO = subprocess.PIPE,
+        stderr: None | int | IO = subprocess.PIPE,
+        text: bool = True,
+        **kwargs,
     ) -> subprocess.CompletedProcess:
         """Run a subprocess. Simple wrapper around subprocess.run.
 
@@ -60,13 +63,15 @@ class Invoker:
         useful when you want to run a command, but don't care about its output and only
         care about its return code.
 
-        stdout and stderr by default are setup to use subprocess.PIPE. If you do not
+        stdout and stderr by default are set up to use subprocess.PIPE. If you do not
         want to capture io from the subprocess use subprocess.DEVNULL to discard it.
 
         Args:
             *args: The arguments to pass to the subprocess.
             stdout: The stdout stream to use.
             stderr: The stderr stream to use.
+            text: If true, decode stdin, stdout and stderr using the system default.
+            **kwargs: Additional keyword arguments to pass to subprocess.run.
 
         Returns:
             The completed process.
@@ -74,14 +79,14 @@ class Invoker:
         Raises:
             subprocess.CalledProcessError: If the subprocess failed.
         """
-
         return subprocess.run(
             [self.bin, *args],
             cwd=self.cwd,
-            universal_newlines=self.universal_newlines,
             stdout=stdout,
             stderr=stderr,
             check=True,
+            text=text,
+            **kwargs,
         )
 
     @staticmethod
@@ -108,7 +113,7 @@ class Invoker:
             popen_args.extend(*args)
 
         p = await asyncio.create_subprocess_exec(
-            self.bin, *popen_args, stdout=PIPE, stderr=PIPE, env=self.popen_env
+            self.bin, *popen_args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=self.popen_env
         )
         asyncio.create_task(self._log_stdio(p.stderr))
         asyncio.create_task(self._log_stdio(p.stdout))

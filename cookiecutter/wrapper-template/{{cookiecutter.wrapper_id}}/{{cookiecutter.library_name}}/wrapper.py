@@ -19,7 +19,7 @@ class {{ cookiecutter.source_name }}(ExtensionBase):
 
     def __init__(self):
         self.{{ cookiecutter.extension_name }}_bin = "{{ cookiecutter.wrapper_target_name }}" # verify this is the correct name
-        self.{{ cookiecutter.extension_name }}_invoker = Invoker(self.{{ cookiecutter.extension_name }}_bin, env=os.environ.copy())
+        self.{{ cookiecutter.extension_name }}_invoker = Invoker(self.{{ cookiecutter.extension_name }}_bin)
 
     def invoke(self, command_name: str | None, *command_args):
         """Invoke the underlying cli, that is being wrapped by this extension."""
