@@ -1,13 +1,13 @@
 """Meltano extension SDK base class and supporting methods."""
 from __future__ import annotations
 
-import json
 import sys
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 
 import structlog
 import yaml
+from devtools.prettier import pformat
 
 from meltano_extension_sdk import models
 
@@ -71,7 +71,7 @@ class ExtensionBase(metaclass=ABCMeta):
             str: The formatted description.
         """
         if output_format == DescribeFormat.text:
-            return f"{self.describe()}"
+            return pformat(self.describe())
         elif output_format == DescribeFormat.json:
             return self.describe().json(indent=2)
         elif output_format == DescribeFormat.yaml:
