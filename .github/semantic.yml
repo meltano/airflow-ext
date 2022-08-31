@@ -25,9 +25,7 @@ types:
 # e.g. for a PR title/commit message of "feat(awesome-feature): add some stuff",
 #      the scope would be "awesome-feature"
 scopes:
-  - sdk       # SDK only - temporary until sdk has its own repo
   - extension # extension only
   - files     # deployable files only
-  - templates  # cookiecutters - temporary until sdk has its own repo
   - deps       # production dependencies
   - deps-dev   # development depencencies (testing, linting, etc.)
