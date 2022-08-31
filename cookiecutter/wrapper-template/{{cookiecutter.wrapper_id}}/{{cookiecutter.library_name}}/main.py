@@ -23,8 +23,13 @@ app = typer.Typer(pretty_exceptions_enable=False)
 
 
 @app.command()
-def initialize(ctx: typer.Context, force: bool = False):
-    """Initialize the {{ cookiecutter.source_name }} plugin."""
+def initialize(ctx: typer.Context, force: bool = False) -> None:
+    """Initialize the {{ cookiecutter.source_name }} plugin.
+
+    Args:
+        ctx: The typer context.
+        force: If True, and if you would like to support it - force initialization.
+    """
     try:
         ext.initialize(force)
     except Exception:
@@ -37,7 +42,7 @@ def initialize(ctx: typer.Context, force: bool = False):
 @app.command(
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
 )
-def invoke(ctx: typer.Context, command_args: List[str]):
+def invoke(ctx: typer.Context, command_args: List[str]) -> None:
     """Invoke the plugin.
 
     Note: that if a command argument is a list, such as command_args, then
@@ -87,9 +92,16 @@ def main(
     meltano_log_json: bool = typer.Option(
         False, "--meltano-log-json", envvar="MELTANO_LOG_JSON", help="Log in the meltano JSON log format"
     ),
-):
+) -> None:
     """
     Simple Meltano extension that wraps the {{ cookiecutter.wrapper_target_name }} CLI.
+
+    Args:
+        ctx: The typer.Context for this invocation
+        log_level: The log level to use.
+        log_timestamps: Show timestamp in logs.
+        log_levels: Show log levels.
+        meltano_log_json: Log in the meltano JSON log format.
     """
     default_logging_config(
         level=parse_log_level(log_level), timestamps=log_timestamps, levels=log_levels, json_format=meltano_log_json

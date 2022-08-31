@@ -8,7 +8,6 @@ from enum import Enum
 import structlog
 import yaml
 from devtools.prettier import pformat
-
 from meltano_extension_sdk import models
 
 

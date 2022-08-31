@@ -1,14 +1,14 @@
+"""Entry point for the Meltano Airflow extension."""
 import os
 import sys
 from typing import List
 
 import structlog
 import typer
+from meltano_extension_sdk.extension import DescribeFormat
+from meltano_extension_sdk.logging import default_logging_config, parse_log_level
 
 from ext_airflow.wrapper import Airflow
-from meltano_extension_sdk.extension import DescribeFormat
-from meltano_extension_sdk.logging import (default_logging_config,
-                                           parse_log_level)
 
 log = structlog.get_logger("airflow_extension")
 
@@ -28,6 +28,7 @@ def initialize(ctx: typer.Context, force: bool = False) -> None:
     airflow dag generator.
 
     Args:
+        ctx: The typer context. Unused.
         force: If True, force initialization.
     """
     try:
@@ -96,11 +97,11 @@ def main(
         envvar="MELTANO_LOG_JSON",
         help="Log in the meltano JSON log format",
     ),
-):
-    """
-    Simple Meltano extension to wrap the airflow CLI.
+) -> None:
+    """Simple Meltano extension to wrap the airflow CLI.
 
     Args:
+        ctx: The typer.Context for this invocation. Unused.
         log_level: The log level to use.
         log_timestamps: Show timestamp in logs.
         log_levels: Show log levels.

@@ -1,3 +1,4 @@
+"""Meltano Airflow extension."""
 from __future__ import annotations
 
 import os
@@ -5,9 +6,9 @@ import pkgutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import structlog
-
 from meltano_extension_sdk import models
 from meltano_extension_sdk.extension import ExtensionBase
 from meltano_extension_sdk.process import Invoker, log_subprocess_error
@@ -16,8 +17,10 @@ log = structlog.get_logger("airflow_extension")
 
 
 class Airflow(ExtensionBase):
-    def __init__(self):
+    """Airflow extension implementing the ExtensionBase interface."""
 
+    def __init__(self) -> None:
+        """Initialize the airflow extension."""
         self.app_name = "airflow_extension"
         self.airflow_bin = "airflow"
         self.airflow_invoker = Invoker(self.airflow_bin)
@@ -46,11 +49,17 @@ class Airflow(ExtensionBase):
         # Configure the env to make airflow installable without GPL deps.
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    def pre_invoke(self):
+    def pre_invoke(self) -> None:
+        """Perform pre-invoke tasks for the extension."""
         self._create_config()
         self._initdb()
 
-    def initialize(self, force: bool = False):
+    def initialize(self, force: bool = False) -> None:
+        """Initialize the extension.
+
+        Args:
+            force: If True, force initialization where possible (currently no where).
+        """
         self.pre_invoke()
 
         self.airflow_core_dags_path.mkdir(parents=True, exist_ok=True)
@@ -75,7 +84,15 @@ class Airflow(ExtensionBase):
                 pkgutil.get_data("files_airflow_ext", "orchestrate/README.md")
             )
 
-    def invoke(self, command_name: str | None, *command_args):
+    def invoke(self, command_name: str | None, *command_args: Any) -> None:
+        """Invoke the airflow command.
+
+        Note: will sys.exit() if the command fails.
+
+        Args:
+            command_name: The command name to invoke.
+            command_args: The command args to pass along.
+        """
         try:
             self.airflow_invoker.run_and_log(command_name, *command_args)
         except subprocess.CalledProcessError as err:
@@ -85,6 +102,11 @@ class Airflow(ExtensionBase):
             sys.exit(err.returncode)
 
     def describe(self) -> models.Describe:
+        """Describe the extension.
+
+        Returns:
+            The extension description
+        """
         # TODO: could we auto-generate all or portions of this from typer instead?
         return models.Describe(
             commands=[
@@ -97,7 +119,7 @@ class Airflow(ExtensionBase):
             ]
         )
 
-    def _create_config(self):
+    def _create_config(self) -> None:
         # create an initial airflow config file
         try:
             self.airflow_invoker.run("--help", stdout=subprocess.DEVNULL)
@@ -107,7 +129,7 @@ class Airflow(ExtensionBase):
             )
             sys.exit(err.returncode)
 
-    def _initdb(self):
+    def _initdb(self) -> None:
         """Initialize the airflow metadata database."""
         try:
             self.airflow_invoker.run("db", "init")

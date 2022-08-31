@@ -89,6 +89,7 @@ def default_logging_config(
         level=level,
     )
 
+
 def pass_through_logging_config() -> None:
     """Pass-through logging configuration.
 

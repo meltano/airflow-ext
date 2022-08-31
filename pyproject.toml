@@ -38,6 +38,11 @@ cookiecutter = "^2.1.1"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.isort]
+profile = "black"
+multi_line_output = 3 # Vertical Hanging Indent
+src_paths = "ext_airflow"
+
 [tool.poetry.scripts]
 airflow_extension = 'ext_airflow.main:app'
 airflow_invoker = 'ext_airflow.pass_through:pass_through_cli'

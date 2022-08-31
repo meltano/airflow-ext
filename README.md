@@ -12,13 +12,13 @@ Meltano Airflow utility extension
     executable: airflow_invoker
     commands:
       describe:
-        executable: airflow_extension 
+        executable: airflow_extension
         args: describe
       initialize:
-        executable: airflow_extension 
+        executable: airflow_extension
         args: initialize
       invoke:
-        executable: airflow_extension 
+        executable: airflow_extension
         args: invoke
     settings:
     - name: core.dags_folder
@@ -68,9 +68,9 @@ meltano invoke airflow --help
 meltano invoke airflow users create -u admin@localhost -p password --role Admin -e admin@localhost -f admin -l admin
 
 # start the scheduler, backgrounding the process
-meltano invoke airflow scheduler & 
+meltano invoke airflow scheduler &
 # start the webserver, keeping it in the foreground
-meltano invoke airflow webserver 
+meltano invoke airflow webserver
 ```
 
 ## Cookiecutter

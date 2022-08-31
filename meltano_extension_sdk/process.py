@@ -113,7 +113,11 @@ class Invoker:
             popen_args.extend(*args)
 
         p = await asyncio.create_subprocess_exec(
-            self.bin, *popen_args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, env=self.popen_env
+            self.bin,
+            *popen_args,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=self.popen_env,
         )
         asyncio.create_task(self._log_stdio(p.stderr))
         asyncio.create_task(self._log_stdio(p.stdout))
