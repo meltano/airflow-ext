@@ -258,8 +258,8 @@ structlog = "^21.2.0"
 [package.source]
 type = "git"
 url = "https://github.com/meltano/edk.git"
-reference = "3-chore-transfer-edk-from-airflow-extension"
-resolved_reference = "c06f15c0c8cc9b0e47fa10d37bedcf1a9cf692b3"
+reference = "main"
+resolved_reference = "56b159f1454cbb9cb371e2a26985d1795620c4a2"
 
 [[package]]
 name = "mypy-extensions"
@@ -472,7 +472,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "a9657b3881f1fa6b81a00be2e96af5d458c1c1443cbbfe2ee292e9e0a82cc370"
+content-hash = "3b3fde8bdd43ebfb0763dcebd6e797640a30cc1e07cda78f475534f589eebe51"
 
 [metadata.files]
 arrow = [
