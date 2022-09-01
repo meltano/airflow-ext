@@ -1,16 +1,16 @@
 [tool.poetry]
-name = "ext-airflow"
+name = "airflow-ext"
 version = "0.1.0"
 description = "Airflow utility extension for Meltano"
 authors = ["Meltano Team and Contributors"]
 maintainers = ["Meltano Team and Contributors"]
 readme = "README.md"
-repository = "https://github.com/meltano/ext-airflow"
+repository = "https://github.com/meltano/airflow-ext"
 
 license = "Apache 2.0"
 
 packages = [
-    { include = "ext_airflow" },
+    { include = "airflow_ext" },
     { include = "files_airflow_ext"},
     { include = "meltano_extension_sdk" }
 ]
@@ -41,8 +41,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.isort]
 profile = "black"
 multi_line_output = 3 # Vertical Hanging Indent
-src_paths = "ext_airflow"
+src_paths = "airflow_ext"
 
 [tool.poetry.scripts]
-airflow_extension = 'ext_airflow.main:app'
-airflow_invoker = 'ext_airflow.pass_through:pass_through_cli'
+airflow_extension = 'airflow_ext.main:app'
+airflow_invoker = 'airflow_ext.pass_through:pass_through_cli'

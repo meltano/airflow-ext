@@ -4,7 +4,7 @@ import sys
 import structlog
 from meltano_extension_sdk.logging import pass_through_logging_config
 
-from ext_airflow.wrapper import Airflow
+from airflow_ext.wrapper import Airflow
 
 
 def pass_through_cli() -> None:
