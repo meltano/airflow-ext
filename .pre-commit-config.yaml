@@ -9,33 +9,20 @@ repos:
   hooks:
   - id: check-json
   - id: check-toml
-    exclude: |
-        (?x)^(
-            cookiecutter/.*/pyproject.toml
-        )$
   - id: check-yaml
-    exclude: |
-        (?x)^(
-            cookiecutter/.*/meltano.yml
-        )$
   - id: end-of-file-fixer
-    exclude: (cookiecutter/.*|docs/.*|samples/.*\.json)
+    exclude: (docs/.*|samples/.*\.json)
   - id: trailing-whitespace
 
 - repo: https://github.com/psf/black
   rev: 22.6.0
   hooks:
   - id: black
-    exclude: |
-        (?x)^(
-            cookiecutter/.*
-        )$
 
 - repo: https://github.com/pycqa/isort
   rev: 5.10.1
   hooks:
   - id: isort
-    exclude: (cookiecutter/.*)
 
 - repo: https://github.com/pycqa/flake8
   rev: 5.0.4
@@ -46,6 +33,7 @@ repos:
     - flake8-annotations==2.9.0
     - flake8-docstrings==1.6.0
     files: 'airflow_ext/.*'
+    exclude: 'files_airflow_ext/orchestrate/meltano.py'
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.37.3

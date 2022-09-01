@@ -5,8 +5,8 @@ from typing import List
 
 import structlog
 import typer
-from meltano_extension_sdk.extension import DescribeFormat
-from meltano_extension_sdk.logging import default_logging_config, parse_log_level
+from meltano.edk.extension import DescribeFormat
+from meltano.edk.logging import default_logging_config, parse_log_level
 
 from airflow_ext.wrapper import Airflow
 
