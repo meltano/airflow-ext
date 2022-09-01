@@ -2,7 +2,7 @@
 import sys
 
 import structlog
-from meltano_extension_sdk.logging import pass_through_logging_config
+from meltano.edk.logging import pass_through_logging_config
 
 from airflow_ext.wrapper import Airflow
 
