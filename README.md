@@ -1,4 +1,4 @@
-# ext-airflow
+# airflow-ext
 Meltano Airflow utility extension
 
 ### example meltano.yml
@@ -7,7 +7,7 @@ Meltano Airflow utility extension
   utilities:
   - name: airflow
     namespace: airflow
-    pip_url: git+https://github.com/meltano/ext-airflow.git@feat-init-extension apache-airflow==2.3.3
+    pip_url: git+https://github.com/meltano/airflow-ext.git@feat-init-extension apache-airflow==2.3.3
       --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-3.8.txt
     executable: airflow_invoker
     commands:
@@ -85,8 +85,8 @@ $ cookiecutter cookiecutter/wrapper-template -o path/to/your/project
 source_name [MyExtensionName]: Airflow
 admin_name [FirstName LastName]: Bob Loblaw
 extension_name [airflow]:
-wrapper_id [ext-airflow]:
-library_name [ext_airflow]:
+wrapper_id [airflow-ext]:
+library_name [airflow_ext]:
 cli_prefix [airflow]:
 wrapper_target_name [some-third-party-cli]: airflow
 ```
@@ -96,9 +96,9 @@ This will yield a project with the following structure (assuming the above vars 
 ```shell
 $ tree
 .
-└── ext-airflow
+└── airflow-ext
     ├── README.md
-    ├── ext_airflow
+    ├── airflow_ext
     │   ├── __init__.py
     │   ├── main.py
     │   ├── pass_through.py

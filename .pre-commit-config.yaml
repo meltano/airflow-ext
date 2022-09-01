@@ -45,7 +45,7 @@ repos:
     - darglint==1.8.1
     - flake8-annotations==2.9.0
     - flake8-docstrings==1.6.0
-    files: 'ext_airflow/.*'
+    files: 'airflow_ext/.*'
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.37.3
