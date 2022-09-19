@@ -17,6 +17,7 @@ packages = [
 include = [
     "files_airflow_ext/orchestrate/meltano.py",
     "files_airflow_ext/orchestrate/README.md",
+    "files_airflow_ext/dot-gitignore",
 ]
 
 [tool.poetry.dependencies]
