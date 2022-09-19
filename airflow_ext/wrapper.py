@@ -78,7 +78,6 @@ class Airflow(ExtensionBase):
         if not readme_path.exists():
             log.debug(
                 "meltano dag generator README not found, will be auto-generated",
-                "meltano dag generator README not found, will be auto-generated",
                 readme_path=readme_path,
             )
             readme_path.write_bytes(
