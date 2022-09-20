@@ -7,7 +7,7 @@ Meltano Airflow utility extension
   utilities:
   - name: airflow
     namespace: airflow
-    pip_url: git+https://github.com/meltano/airflow-ext.git@feat-init-extension apache-airflow==2.3.3
+    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3
       --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-3.8.txt
     executable: airflow_invoker
     commands:
