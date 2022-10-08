@@ -49,8 +49,13 @@ class Airflow(ExtensionBase):
         # Configure the env to make airflow installable without GPL deps.
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    def pre_invoke(self) -> None:
-        """Perform pre-invoke tasks for the extension."""
+    def pre_invoke(self, command_name: str | None, *command_args: Any) -> None:
+        """Perform pre-invoke tasks for the extension.
+
+        Args:
+            command_name: The name of the command that will be invoked (unused).
+            *command_args: The arguments that would be passed (unused).
+        """
         self._create_config()
         self._initdb()
 
@@ -60,7 +65,7 @@ class Airflow(ExtensionBase):
         Args:
             force: If True, force initialization where possible (currently no where).
         """
-        self.pre_invoke()
+        self.pre_invoke("initialize", None)
 
         self.airflow_core_dags_path.mkdir(parents=True, exist_ok=True)
 
