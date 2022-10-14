@@ -5,7 +5,9 @@
 
 *
 
-# Allow this gitignore, airflow.cfg, webserver_config.py to be checked in to the repo.
+# Allow some explicit files and paths to be checked in
 !.gitignore
-!airflow.cfg
+!config/airflow.cfg
 !webserver_config.py
+!plugins
+!dags

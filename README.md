@@ -23,11 +23,11 @@ Meltano Airflow utility extension
     settings:
     - name: core.dags_folder
       label: DAGs Folder
-      value: $MELTANO_PROJECT_ROOT/orchestrate/dags
+      value: $MELTANO_PROJECT_ROOT/orchestrate/airflow/dags
       env: AIRFLOW__CORE__DAGS_FOLDER
     - name: core.plugins_folder
       label: Plugins Folder
-      value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+      value: $MELTANO_PROJECT_ROOT/orchestrate/airflow/plugins
       env: AIRFLOW__CORE__PLUGINS_FOLDER
     - name: core.load_examples
       label: Load Examples
@@ -39,7 +39,7 @@ Meltano Airflow utility extension
       value: false
     - name: database.sql_alchemy_conn
       label: SQL Alchemy Connection
-      value: sqlite:///$MELTANO_PROJECT_ROOT/airflow/airflow.db
+      value: sqlite:///$MELTANO_PROJECT_ROOT/orchestrate/airflow/config/airflow.db
       env: AIRFLOW__CORE__SQL_ALCHEMY_CONN
     - name: webserver.web_server_port
       label: Webserver Port
@@ -47,7 +47,7 @@ Meltano Airflow utility extension
       env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
     config:
       home: $MELTANO_PROJECT_ROOT/airflow
-      config: $MELTANO_PROJECT_ROOT/airflow/airflow.cfg
+      config: $MELTANO_PROJECT_ROOT/orchestrate/airflow/config/airflow.cfg
 ```
 
 ## installation
