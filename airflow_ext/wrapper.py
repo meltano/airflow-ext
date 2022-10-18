@@ -89,17 +89,6 @@ class Airflow(ExtensionBase):
                 pkgutil.get_data("files_airflow_ext", "orchestrate/README.md")
             )
 
-        git_ignore_path = Path(self.airflow_home) / ".gitignore"
-        if not git_ignore_path.exists():
-            log.debug(
-                "No .gitignore not found in $AIRFLOW_HOME, will be auto-generated",
-                git_ignore_path=git_ignore_path,
-                airflow_home=self.airflow_home,
-            )
-            git_ignore_path.write_bytes(
-                pkgutil.get_data("files_airflow_ext", "dot-gitignore")
-            )
-
     def invoke(self, command_name: str | None, *command_args: Any) -> None:
         """Invoke the airflow command.
 
