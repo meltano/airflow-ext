@@ -36,7 +36,7 @@ class Airflow(ExtensionBase):
             sys.exit(1)
 
         self.airflow_cfg_path = Path(
-            os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/config/airflow.cfg")
+            os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg")
         )
         self.airflow_core_dags_path = Path(
             os.path.expandvars(
