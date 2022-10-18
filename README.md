@@ -1,7 +1,8 @@
 # airflow-ext
+
 Meltano Airflow utility extension
 
-### example meltano.yml
+## Example meltano.yml entry
 
 ```yaml
   utilities:
@@ -21,6 +22,10 @@ Meltano Airflow utility extension
         executable: airflow_extension
         args: invoke
     settings:
+    - name: database.sql_alchemy_conn
+      label: SQL Alchemy Connection
+      value: sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db
+      env: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
     - name: core.dags_folder
       label: DAGs Folder
       value: $MELTANO_PROJECT_ROOT/orchestrate/airflow/dags
@@ -37,20 +42,45 @@ Meltano Airflow utility extension
       label: Pause DAGs at Creation
       env: AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION
       value: false
-    - name: database.sql_alchemy_conn
-      label: SQL Alchemy Connection
-      value: sqlite:///$MELTANO_PROJECT_ROOT/orchestrate/airflow/config/airflow.db
-      env: AIRFLOW__CORE__SQL_ALCHEMY_CONN
     - name: webserver.web_server_port
       label: Webserver Port
       value: 8080
       env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
-    config:
-      home: $MELTANO_PROJECT_ROOT/airflow
-      config: $MELTANO_PROJECT_ROOT/orchestrate/airflow/config/airflow.cfg
+    - name: logging.base_log_folder
+      label: Base Log Folder
+      value: $MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs
+      env: AIRFLOW__LOGGING__BASE_LOG_FOLDER
+      description: |
+        The folder where airflow should store its log files. This path must be absolute. There are a few existing
+        configurations that assume this is set to the default. If you choose to override this you may need to update
+        the dag_processor_manager_log_location and child_process_log_directory settings as well.
+    - name: logging.dag_processor_manager_log_location
+      label: Dag Processor Manager Log Location
+      value: $MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log
+      env: AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION
+      description: |
+        Where to send dag parser logs.
+    - name: scheduler.child_process_log_directory
+      label: Child Process Log Directory
+      value: $MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/scheduler
+      env: AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY
+      description: |
+        Where to send the logs of each scheduler process.
+    - name: extension.airflow_home
+      label: Airflow Home
+      value: $MELTANO_PROJECT_ROOT/orchestrate/airflow
+      env: AIRFLOW_HOME
+      description: |
+        The directory where Airflow will store its configuration, logs, and other files.
+    - name: extension.airflow_config
+      label: Airflow Home
+      value: $MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg
+      env: AIRFLOW_CONFIG
+      description: |
+        The path where the Airflow configuration file will be stored.
 ```
 
-## installation
+## Installation
 
 ```shell
 # Install the extension
@@ -71,44 +101,4 @@ meltano invoke airflow users create -u admin@localhost -p password --role Admin 
 meltano invoke airflow scheduler &
 # start the webserver, keeping it in the foreground
 meltano invoke airflow webserver
-```
-
-## Cookiecutter
-
-This repo is also the *temporary* location for the cookiecutter template for the meltano extension SDK.
-It will be moved to a more permanent location shortly. In the meantime, you can use the cookiecutter template to create
-a new extension
-
-```shell
-# Create a new project
-$ cookiecutter cookiecutter/wrapper-template -o path/to/your/project
-source_name [MyExtensionName]: Airflow
-admin_name [FirstName LastName]: Bob Loblaw
-extension_name [airflow]:
-wrapper_id [airflow-ext]:
-library_name [airflow_ext]:
-cli_prefix [airflow]:
-wrapper_target_name [some-third-party-cli]: airflow
-```
-
-This will yield a project with the following structure (assuming the above vars are used):
-
-```shell
-$ tree
-.
-└── airflow-ext
-    ├── README.md
-    ├── airflow_ext
-    │   ├── __init__.py
-    │   ├── main.py
-    │   ├── pass_through.py
-    │   └── wrapper.py
-    └── pyproject.toml
-```
-
-```shell
-cd path/to/your/project
-poetry install
-poetry run airflow_extension describe --format=yaml
-poetry run airflow_invoker --help # will return the airflow help assuming airflow is installed
 ```
