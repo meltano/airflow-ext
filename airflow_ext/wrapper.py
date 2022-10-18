@@ -42,7 +42,7 @@ class Airflow(ExtensionBase):
             os.path.expandvars(
                 os.environ.get(
                     "AIRFLOW__CORE__DAGS_FOLDER",
-                    f"{self.airflow_home}/orchestrate/dags",
+                    f"{self.airflow_home}/dags",
                 )
             )
         )
