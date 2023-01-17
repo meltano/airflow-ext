@@ -21,7 +21,8 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.12"
-typer = "^0.6.1"
+structlog = ">=20.1.0"
+typer = "^0.7.0"
 "meltano.edk" = {git = "https://github.com/meltano/edk.git", rev = "main"}
 
 [tool.poetry.dev-dependencies]
