@@ -23,7 +23,7 @@ include = [
 python = ">=3.7,<3.12"
 structlog = ">=20.1.0"
 typer = "^0.7.0"
-"meltano.edk" = {git = "https://github.com/meltano/edk.git", rev = "main"}
+"meltano.edk" = {git = "https://github.com/meltano/edk.git", rev = "v0.1.0"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
