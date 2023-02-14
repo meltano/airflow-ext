@@ -43,17 +43,42 @@ if not Path(PROJECT_ROOT).joinpath(MELTANO_BIN).exists():
     MELTANO_BIN = "meltano"
 
 
+def _is_enabled(schedule_def: dict, environment_name: str) -> bool:
+    """Return true if the schedule should be enabled for the named environment."""
+    airbyte_annotations: dict = schedule_def.get("annotations", {}).get("airbyte", {})
+    if not airbyte_annotations:
+        # No annotations exist. Schedule defaults to enabled.
+        return True
+    
+    if airbyte_annotations.get("disabled", False):
+        # Schedule explicitly disabled.
+        return False
+
+    if "environments" not in airbyte_annotations:
+        # No environment affinity definged. Default to enabled.
+        return True
+    
+    # Return True if schedule is defined for this environment.
+    return environment_name in airbyte_annotations["environments"]
+
+
 def _meltano_elt_generator(schedules):
     """Generate singular dag's for each legacy Meltano elt task.
 
     Args:
         schedules (list): List of Meltano schedules.
     """
+    environment_name = os.environ.get("MELTANO_ENVIRONMENT", "(unknown)")
     for schedule in schedules:
-        logger.info(f"Considering schedule '{schedule['name']}': {schedule}")
+        schedule_name = schedule_name
+        logger.info(f"Considering schedule '{schedule_name}': {schedule}")
+        if not _is_enabled(schedule, environment_name):
+            logger.debug("Schedule '{}' is disabled for environment '{}'", schedule_name, environment_name)
+            continue
+
         if not schedule["cron_interval"]:
             logger.info(
-                f"No DAG created for schedule '{schedule['name']}' because its interval is set to `@once`.",
+                f"No DAG created for schedule '{schedule_name}' because its interval is set to `@once`.",
             )
             continue
 
@@ -61,7 +86,7 @@ def _meltano_elt_generator(schedules):
         if schedule["start_date"]:
             args["start_date"] = schedule["start_date"]
 
-        dag_id = f"meltano_{schedule['name']}"
+        dag_id = f"meltano_{schedule_name}"
 
         tags = DEFAULT_TAGS.copy()
         if schedule["extractor"]:
@@ -91,13 +116,13 @@ def _meltano_elt_generator(schedules):
 
         elt = BashOperator(
             task_id="extract_load",
-            bash_command=f"cd {PROJECT_ROOT}; {MELTANO_BIN} schedule run {schedule['name']}",
+            bash_command=f"cd {PROJECT_ROOT}; {MELTANO_BIN} schedule run {schedule_name}",
             dag=dag,
         )
 
         # register the dag
         globals()[dag_id] = dag
-        logger.info(f"DAG created for schedule '{schedule['name']}'")
+        logger.info(f"DAG created for schedule '{schedule_name}'")
 
 
 def _meltano_job_generator(schedules):
