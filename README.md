@@ -2,6 +2,32 @@
 
 Meltano Airflow utility extension
 
+## Enabling or disabling schedules
+
+This extensions supports disabling schedules and marking schedules exclusive to specific environments via an `annotations` > `airflow` key in `meltano.yml`.
+
+```yml
+schedules:
+- name: slack_notifications
+  interval: 0 12 * * *
+  job: slack_notifications
+  annotations:
+    airflow:
+      disabled: True
+
+- name: cloudwatch_el
+  interval: 0 6 * * *
+  job: cloudwatch_el
+  annotations:
+    airflow:
+      environments: [prod, staging]
+```
+
+The extension handles two basic rules:
+
+1. If `disabled` is `True`, then the job will be disabled for all environments and will not be deployed to the Airflow server.
+2. If `environments` is declared, the schedule will only be enabled if it contains a match to the name of the currently activated Meltano Environment.
+
 ## Example meltano.yml entry
 
 ```yaml
