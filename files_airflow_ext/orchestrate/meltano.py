@@ -1,6 +1,10 @@
+"""Meltano DAG generator."""
+
 # If you want to define a custom DAG, create
 # a new file under orchestrate/dags/ and Airflow
 # will pick it up automatically.
+
+from __future__ import annotations
 
 import json
 import logging
@@ -37,13 +41,14 @@ MELTANO_BIN = ".meltano/run/bin"
 
 if not Path(PROJECT_ROOT).joinpath(MELTANO_BIN).exists():
     logger.warning(
-        f"A symlink to the 'meltano' executable could not be found at '{MELTANO_BIN}'. Falling back on expecting it "
-        f"to be in the PATH instead. "
+        "A symlink to the 'meltano' executable could not be found at '%s'. "
+        "Falling back on expecting it to be in the PATH instead. ",
+        MELTANO_BIN,
     )
     MELTANO_BIN = "meltano"
 
 
-def _meltano_elt_generator(schedules):
+def _meltano_elt_generator(schedules: list) -> None:
     """Generate singular dag's for each legacy Meltano elt task.
 
     Args:
@@ -53,7 +58,8 @@ def _meltano_elt_generator(schedules):
         logger.info(f"Considering schedule '{schedule['name']}': {schedule}")
         if not schedule["cron_interval"]:
             logger.info(
-                f"No DAG created for schedule '{schedule['name']}' because its interval is set to `@once`.",
+                "No DAG created for schedule '%s' because its interval is set to " "`@once`.",
+                schedule["name"],
             )
             continue
 
@@ -89,7 +95,7 @@ def _meltano_elt_generator(schedules):
             max_active_runs=1,
         )
 
-        elt = BashOperator(
+        elt = BashOperator(  # noqa: F841
             task_id="extract_load",
             bash_command=f"cd {PROJECT_ROOT}; {MELTANO_BIN} schedule run {schedule['name']}",
             dag=dag,
@@ -100,7 +106,7 @@ def _meltano_elt_generator(schedules):
         logger.info(f"DAG created for schedule '{schedule['name']}'")
 
 
-def _meltano_job_generator(schedules):
+def _meltano_job_generator(schedules: list) -> None:
     """Generate dag's for each task within a Meltano scheduled job.
 
     Args:
@@ -109,12 +115,14 @@ def _meltano_job_generator(schedules):
     for schedule in schedules:
         if not schedule.get("job"):
             logger.info(
-                f"No DAG's created for schedule '{schedule['name']}'. It was passed to job generator but has no job."
+                "No DAG's created for schedule '%s'. It was passed to job generator but has no job.",
+                schedule["name"],
             )
             continue
         if not schedule["cron_interval"]:
             logger.info(
-                f"No DAG created for schedule '{schedule['name']}' because its interval is set to `@once`."
+                "No DAG created for schedule '%s' because its interval is set to `@once`.",
+                schedule["name"],
             )
             continue
 
@@ -137,7 +145,10 @@ def _meltano_job_generator(schedules):
             previous_task = None
             for idx, task in enumerate(schedule["job"]["tasks"]):
                 logger.info(
-                    f"Considering task '{task}' of schedule '{schedule['name']}': {schedule}"
+                    "Considering task '%s' of schedule '%s': %s",
+                    task,
+                    schedule["name"],
+                    schedule,
                 )
 
                 task_id = f"{base_id}_task{idx}"
@@ -155,21 +166,19 @@ def _meltano_job_generator(schedules):
                 if previous_task:
                     task.set_upstream(previous_task)
                 previous_task = task
-                logger.info(
-                    f"Spun off task '{task}' of schedule '{schedule['name']}': {schedule}"
-                )
+                logger.info("Spun off task '%s' of schedule '%s': %s", task, schedule["name"], schedule)
 
         globals()[base_id] = dag
         logger.info(f"DAG created for schedule '{schedule['name']}', task='{run_args}'")
 
 
-def create_dags():
+def create_dags() -> None:
     """Create DAGs for Meltano schedules."""
     list_result = subprocess.run(
         [MELTANO_BIN, "schedule", "list", "--format=json"],
         cwd=PROJECT_ROOT,
         stdout=subprocess.PIPE,
-        universal_newlines=True,
+        text=True,
         check=True,
     )
     schedule_export = json.loads(list_result.stdout)

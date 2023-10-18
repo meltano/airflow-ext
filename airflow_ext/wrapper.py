@@ -25,19 +25,13 @@ class Airflow(ExtensionBase):
         self.airflow_bin = "airflow"
         self.airflow_invoker = Invoker(self.airflow_bin)
 
-        self.airflow_home = os.environ.get("AIRFLOW_HOME") or os.environ.get(
-            f"{self.app_name}_AIRFLOW_HOME"
-        )
+        self.airflow_home = os.environ.get("AIRFLOW_HOME") or os.environ.get(f"{self.app_name}_AIRFLOW_HOME")
         if not self.airflow_home:
             log.debug("env dump", env=os.environ)
-            log.error(
-                "AIRFLOW_HOME not found in environment, unable to function without it"
-            )
+            log.error("AIRFLOW_HOME not found in environment, unable to function without it")
             sys.exit(1)
 
-        self.airflow_cfg_path = Path(
-            os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg")
-        )
+        self.airflow_cfg_path = Path(os.environ.get("AIRFLOW_CONFIG", f"{self.airflow_home}/airflow.cfg"))
         self.airflow_core_dags_path = Path(
             os.path.expandvars(
                 os.environ.get(
@@ -75,9 +69,7 @@ class Airflow(ExtensionBase):
                 "meltano dag generator not found, will be auto-generated",
                 dag_generator_path=dag_generator_path,
             )
-            dag_generator_path.write_bytes(
-                pkgutil.get_data("files_airflow_ext", "orchestrate/meltano.py")
-            )
+            dag_generator_path.write_bytes(pkgutil.get_data("files_airflow_ext", "orchestrate/meltano.py"))
 
         readme_path = self.airflow_core_dags_path / "README.md"
         if not readme_path.exists():
@@ -85,9 +77,7 @@ class Airflow(ExtensionBase):
                 "meltano dag generator README not found, will be auto-generated",
                 readme_path=readme_path,
             )
-            readme_path.write_bytes(
-                pkgutil.get_data("files_airflow_ext", "orchestrate/README.md")
-            )
+            readme_path.write_bytes(pkgutil.get_data("files_airflow_ext", "orchestrate/README.md"))
 
     def invoke(self, command_name: str | None, *command_args: Any) -> None:
         """Invoke the airflow command.
@@ -101,9 +91,7 @@ class Airflow(ExtensionBase):
         try:
             self.airflow_invoker.run_and_log(command_name, *command_args)
         except subprocess.CalledProcessError as err:
-            log_subprocess_error(
-                f"airflow {command_name}", err, "airflow invocation failed"
-            )
+            log_subprocess_error(f"airflow {command_name}", err, "airflow invocation failed")
             sys.exit(err.returncode)
 
     def describe(self) -> models.Describe:
@@ -115,12 +103,8 @@ class Airflow(ExtensionBase):
         # TODO: could we auto-generate all or portions of this from typer instead?
         return models.Describe(
             commands=[
-                models.ExtensionCommand(
-                    name="airflow_extension", description="airflow extension commands"
-                ),
-                models.InvokerCommand(
-                    name="airflow_invoker", description="airflow pass through invoker"
-                ),
+                models.ExtensionCommand(name="airflow_extension", description="airflow extension commands"),
+                models.InvokerCommand(name="airflow_invoker", description="airflow pass through invoker"),
             ]
         )
 
@@ -131,9 +115,7 @@ class Airflow(ExtensionBase):
         try:
             self.airflow_invoker.run("--help", stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            log_subprocess_error(
-                "airflow --help", err, "initial airflow invocation failed"
-            )
+            log_subprocess_error("airflow --help", err, "initial airflow invocation failed")
             sys.exit(err.returncode)
 
     def _initdb(self) -> None:

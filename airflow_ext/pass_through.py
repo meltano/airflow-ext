@@ -13,5 +13,5 @@ def pass_through_cli() -> None:
     ext = Airflow()
     ext.pass_through_invoker(
         structlog.getLogger("airflow_invoker"),
-        *sys.argv[1:] if len(sys.argv) > 1 else []
+        *sys.argv[1:] if len(sys.argv) > 1 else [],
     )
