@@ -1,4 +1,5 @@
 """Entry point for the Meltano Airflow extension."""
+
 import os
 import sys
 from typing import List
