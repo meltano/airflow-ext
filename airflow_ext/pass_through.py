@@ -1,4 +1,5 @@
 """Passthrough shim for airflow extension."""
+
 import sys
 
 import structlog
