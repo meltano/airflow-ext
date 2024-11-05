@@ -23,7 +23,7 @@ include = [
 python = ">=3.8,<4"
 structlog = ">=20.1.0"
 typer = "^0.12.5"
-"meltano.edk" = "~=0.4.2"
+"meltano.edk" = "~=0.4.3"
 
 [tool.poetry.group.dev.dependencies]
 apache-airflow = "*"
