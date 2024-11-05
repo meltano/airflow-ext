@@ -162,6 +162,8 @@ def _meltano_job_generator(schedules: list) -> None:
                     task_id=task_id,
                     bash_command=f"cd {PROJECT_ROOT}; {MELTANO_BIN} run {run_args}",
                     dag=dag,
+                    env=schedule.get("env", {}),   # snag an env from the schedule
+                    append_env=True, # append , don't replace the inherited env
                 )
                 if previous_task:
                     task.set_upstream(previous_task)
