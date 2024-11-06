@@ -64,8 +64,7 @@ def _meltano_elt_generator(schedules: list) -> None:
             continue
 
         args = DEFAULT_ARGS.copy()
-        if schedule["start_date"]:
-            args["start_date"] = schedule["start_date"]
+        args["start_date"] = schedule.get("start_date", datetime(1970, 1, 1, 0, 0, 0))
 
         dag_id = f"meltano_{schedule['name']}"
 
