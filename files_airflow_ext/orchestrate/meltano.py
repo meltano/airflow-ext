@@ -58,7 +58,7 @@ def _meltano_elt_generator(schedules: list) -> None:
         logger.info(f"Considering schedule '{schedule['name']}': {schedule}")
         if not schedule["cron_interval"]:
             logger.info(
-                "No DAG created for schedule '%s' because its interval is set to " "`@once`.",
+                "No DAG created for schedule '%s' because its interval is set to `@once`.",
                 schedule["name"],
             )
             continue
