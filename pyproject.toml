@@ -7,7 +7,7 @@ maintainers = ["Meltano Team and Contributors"]
 readme = "README.md"
 repository = "https://github.com/meltano/airflow-ext"
 
-license = "Apache 2.0"
+license = "Apache-2.0"
 
 packages = [
     { include = "airflow_ext" },
@@ -26,7 +26,7 @@ typer = "^0.15.2"
 "meltano.edk" = "~=0.4.4"
 
 [tool.poetry.group.dev.dependencies]
-apache-airflow = "*"
+apache-airflow = ">=2.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -37,9 +37,6 @@ airflow_extension = 'airflow_ext.main:app'
 airflow_invoker = 'airflow_ext.pass_through:pass_through_cli'
 
 [tool.ruff]
-ignore = [
-  "ANN101",
-]
 line-length = 120
 select = [
   "E",
@@ -49,6 +46,7 @@ select = [
   "ANN",
   "D",
   "UP",
+  "DOC",
 ]
 target-version = "py38"
 

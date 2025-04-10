@@ -2,6 +2,8 @@
 
 Meltano Airflow utility extension
 
+Apache Airflow 2.7+ is required.
+
 ## Example meltano.yml entry
 
 ```yaml
