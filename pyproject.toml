@@ -22,7 +22,7 @@ include = [
 [tool.poetry.dependencies]
 python = ">=3.8,<4"
 structlog = ">=20.1.0"
-typer = "^0.15.2"
+typer = "^0.15.3"
 "meltano.edk" = "~=0.4.4"
 
 [tool.poetry.group.dev.dependencies]
