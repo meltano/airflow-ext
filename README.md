@@ -2,7 +2,7 @@
 
 Meltano Airflow utility extension
 
-Apache Airflow 2.7+ is required.
+Apache Airflow 2.7+ is required, adjustments made for Airflow 3.x compatibility
 
 ## Example meltano.yml entry
 
@@ -10,8 +10,11 @@ Apache Airflow 2.7+ is required.
   utilities:
   - name: airflow
     namespace: airflow
-    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3
-      --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-3.8.txt
+    pip_url: >
+      git+https://github.com/meltano/edk.git@main
+      git+https://github.com/monomeric/airflow-ext.git@main
+      apache-airflow==3.2.0
+      --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.2.0/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
     executable: airflow_invoker
     commands:
       describe:
@@ -47,7 +50,11 @@ Apache Airflow 2.7+ is required.
     - name: webserver.web_server_port
       label: Webserver Port
       value: 8080
-      env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+      env: AIRFLOW__API__PORT
+      description: |
+        The web and API server port, formerly set by AIRFLOW__WEBSERVER__WEB_SERVER_PORT in Airflow 2.x. If this variable
+        remains unset with Airflow 3.x, configuration generation may fail as the airflow.cfg file catches debug logs through
+        'stdout' upon creation by 'airflow config list --defaults'.
     - name: logging.base_log_folder
       label: Base Log Folder
       value: $MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs
@@ -101,6 +108,10 @@ meltano invoke airflow users create -u admin@localhost -p password --role Admin 
 
 # start the scheduler, backgrounding the process
 meltano invoke airflow scheduler &
+# start the triggerer, backgrounding the process
+meltano invoke airflow triggerer &
+# start the dag processor, backgrounding the process
+meltano invoke airflow dag-processor &
 # start the webserver, keeping it in the foreground
-meltano invoke airflow webserver
+meltano invoke airflow api-server
 ```
