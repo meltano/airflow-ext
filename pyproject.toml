@@ -1,40 +1,62 @@
-[tool.poetry]
+[project]
 name = "airflow-ext"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Airflow utility extension for Meltano"
-authors = ["Meltano Team and Contributors"]
-maintainers = ["Meltano Team and Contributors"]
+authors = [{ name = "Meltano Team and Contributors" }]
+requires-python = ">=3.10,<3.15"
 readme = "README.md"
-repository = "https://github.com/meltano/airflow-ext"
-
 license = "Apache-2.0"
-
-packages = [
-    { include = "airflow_ext" },
-    { include = "files_airflow_ext"},
+maintainers = [{ name = "Meltano Team and Contributors" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "structlog>=20.1.0",
+    "typer>=0.19.0",
+    "meltano.edk~=0.6.1",
 ]
 
+[project.urls]
+Repository = "https://github.com/meltano/airflow-ext"
+
+[project.scripts]
+airflow_extension = "airflow_ext.main:app"
+airflow_invoker = "airflow_ext.pass_through:pass_through_cli"
+
+[dependency-groups]
+dev = ["apache-airflow>=2.7"]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.hatch.build.targets.sdist]
 include = [
-    "files_airflow_ext/orchestrate/meltano.py",
-    "files_airflow_ext/orchestrate/README.md",
+    "airflow_ext",
+    "files_airflow_ext",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.15"
-structlog = ">=20.1.0"
-typer = ">=0.19.0"
-"meltano.edk" = "~=0.6.0"
+[tool.hatch.build.targets.sdist.force-include]
+"files_airflow_ext/orchestrate/meltano.py" = "files_airflow_ext/orchestrate/meltano.py"
+"files_airflow_ext/orchestrate/README.md" = "files_airflow_ext/orchestrate/README.md"
 
-[tool.poetry.group.dev.dependencies]
-apache-airflow = ">=2.7"
+[tool.hatch.build.targets.wheel]
+include = [
+    "airflow_ext",
+    "files_airflow_ext",
+]
+
+[tool.hatch.version]
+fallback-version = "0.0.0.dev0"
+source = "vcs"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-airflow_extension = 'airflow_ext.main:app'
-airflow_invoker = 'airflow_ext.pass_through:pass_through_cli'
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 120
