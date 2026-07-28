@@ -1,43 +1,76 @@
-[tool.poetry]
+[project]
 name = "airflow-ext"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Airflow utility extension for Meltano"
-authors = ["Meltano Team and Contributors"]
-maintainers = ["Meltano Team and Contributors"]
+authors = [{ name = "Meltano Team and Contributors" }]
+requires-python = ">=3.10,<3.15"
 readme = "README.md"
-repository = "https://github.com/meltano/airflow-ext"
-
 license = "Apache-2.0"
-
-packages = [
-    { include = "airflow_ext" },
-    { include = "files_airflow_ext"},
+maintainers = [{ name = "Meltano Team and Contributors" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "meltano.edk~=0.6.1",
+    "packaging>=26.2",
+    "structlog>=20.1.0",
+    "typer>=0.19.0",
+    "typing-extensions>=4.16.0 ; python_full_version < '3.12'",
 ]
 
+[project.urls]
+Repository = "https://github.com/meltano/airflow-ext"
+
+[project.scripts]
+airflow_extension = "airflow_ext.main:app"
+airflow_invoker = "airflow_ext.pass_through:pass_through_cli"
+
+[dependency-groups]
+dev = [
+    "apache-airflow>=2.7",
+    "tox",
+    "tox-uv",
+    {include-group = "test"},
+]
+test = ["pytest>=9"]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.pytest]
+filterwarnings = [
+  "error",
+]
+minversion = "9"
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.sdist]
 include = [
-    "files_airflow_ext/orchestrate/meltano.py",
-    "files_airflow_ext/orchestrate/README.md",
+    "airflow_ext",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<4"
-structlog = ">=20.1.0"
-typer = ">=0.19.0"
-"meltano.edk" = "~=0.6.0"
+[tool.hatch.build.targets.wheel]
+include = [
+    "airflow_ext",
+]
 
-[tool.poetry.group.dev.dependencies]
-apache-airflow = ">=2.7"
+[tool.hatch.version]
+fallback-version = "0.0.0.dev0"
+source = "vcs"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-airflow_extension = 'airflow_ext.main:app'
-airflow_invoker = 'airflow_ext.pass_through:pass_through_cli'
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 select = [
   "E",
   "F",
@@ -48,13 +81,12 @@ select = [
   "UP",
   "DOC",
 ]
-target-version = "py38"
 
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["typer.Option"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
