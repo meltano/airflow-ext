@@ -16,9 +16,11 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+    "meltano.edk~=0.6.1",
+    "packaging>=26.2",
     "structlog>=20.1.0",
     "typer>=0.19.0",
-    "meltano.edk~=0.6.1",
+    "typing-extensions>=4.16.0 ; python_full_version < '3.12'",
 ]
 
 [project.urls]
@@ -29,25 +31,32 @@ airflow_extension = "airflow_ext.main:app"
 airflow_invoker = "airflow_ext.pass_through:pass_through_cli"
 
 [dependency-groups]
-dev = ["apache-airflow>=2.7"]
+dev = [
+    "apache-airflow>=2.7",
+    "tox",
+    "tox-uv",
+    {include-group = "test"},
+]
+test = ["pytest>=9"]
 
 [tool.uv]
 default-groups = "all"
 
+[tool.pytest]
+filterwarnings = [
+  "error",
+]
+minversion = "9"
+testpaths = ["tests"]
+
 [tool.hatch.build.targets.sdist]
 include = [
     "airflow_ext",
-    "files_airflow_ext",
 ]
-
-[tool.hatch.build.targets.sdist.force-include]
-"files_airflow_ext/orchestrate/meltano.py" = "files_airflow_ext/orchestrate/meltano.py"
-"files_airflow_ext/orchestrate/README.md" = "files_airflow_ext/orchestrate/README.md"
 
 [tool.hatch.build.targets.wheel]
 include = [
     "airflow_ext",
-    "files_airflow_ext",
 ]
 
 [tool.hatch.version]
@@ -60,6 +69,8 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 select = [
   "E",
   "F",
@@ -70,13 +81,12 @@ select = [
   "UP",
   "DOC",
 ]
-target-version = "py38"
 
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["typer.Option"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"

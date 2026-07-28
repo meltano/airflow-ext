@@ -1,5 +1,0 @@
-[flake8]
-ignore = DAR
-max-line-length = 120
-exclude = files_airflow_ext,cookiecutter
-docstring-convention = google

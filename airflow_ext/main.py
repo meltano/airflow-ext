@@ -2,7 +2,6 @@
 
 import os
 import sys
-from typing import List
 
 import structlog
 import typer
@@ -40,7 +39,7 @@ def initialize(ctx: typer.Context, force: bool = False) -> None:
 
 
 @app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def invoke(ctx: typer.Context, command_args: List[str]) -> None:
+def invoke(ctx: typer.Context, command_args: list[str]) -> None:
     """Invoke the underlying wrapped cli.
 
     Note: that if a command argument is a list, such as command_args, then

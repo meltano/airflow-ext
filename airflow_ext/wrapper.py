@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import importlib.resources
 import os
-import pkgutil
 import subprocess
 import sys
 from pathlib import Path
@@ -13,6 +13,11 @@ import structlog
 from meltano.edk import models
 from meltano.edk.extension import ExtensionBase
 from meltano.edk.process import Invoker, log_subprocess_error
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
 
 log = structlog.get_logger("airflow_extension")
 
@@ -44,16 +49,18 @@ class Airflow(ExtensionBase):
         # Configure the env to make airflow installable without GPL deps.
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    def pre_invoke(self, command_name: str | None, *command_args: Any) -> None:
+    @override
+    def pre_invoke(self, invoke_name: str | None, *command_args: Any) -> None:
         """Perform pre-invoke tasks for the extension.
 
         Args:
-            command_name: The name of the command that will be invoked (unused).
+            invoke_name: The name of the command that will be invoked (unused).
             *command_args: The arguments that would be passed (unused).
         """
         self._create_config()
         self._initdb()
 
+    @override
     def initialize(self, force: bool = False) -> None:
         """Initialize the extension.
 
@@ -70,7 +77,12 @@ class Airflow(ExtensionBase):
                 "meltano dag generator not found, will be auto-generated",
                 dag_generator_path=dag_generator_path,
             )
-            dag_generator_path.write_bytes(pkgutil.get_data("files_airflow_ext", "orchestrate/meltano.py"))
+            dag_generator_path.write_bytes(
+                importlib.resources.read_binary(
+                    "airflow_ext.files",
+                    "orchestrate/meltano.py",
+                )
+            )
 
         readme_path = self.airflow_core_dags_path / "README.md"
         if not readme_path.exists():
@@ -78,8 +90,14 @@ class Airflow(ExtensionBase):
                 "meltano dag generator README not found, will be auto-generated",
                 readme_path=readme_path,
             )
-            readme_path.write_bytes(pkgutil.get_data("files_airflow_ext", "orchestrate/README.md"))
+            readme_path.write_bytes(
+                importlib.resources.read_binary(
+                    "airflow_ext.files",
+                    "orchestrate/README.md",
+                ),
+            )
 
+    @override
     def invoke(self, command_name: str | None, *command_args: Any) -> None:
         """Invoke the airflow command.
 
@@ -95,6 +113,7 @@ class Airflow(ExtensionBase):
             log_subprocess_error(f"airflow {command_name}", err, "airflow invocation failed")
             sys.exit(err.returncode)
 
+    @override
     def describe(self) -> models.Describe:
         """Describe the extension.
 
@@ -125,8 +144,17 @@ class Airflow(ExtensionBase):
             sys.exit(err.returncode)
 
         if proc.stdout:
+            # airflow may emit warnings (e.g. deprecation notices) to stdout ahead of the
+            # actual config, which would otherwise corrupt the ini file. Drop anything
+            # before the first section header.
+            config = proc.stdout
+            if not config.startswith("["):
+                section_start = config.find("\n[")
+                if section_start != -1:
+                    config = config[section_start + 1 :]
+
             with self.airflow_cfg_path.open("w") as f:
-                f.write(proc.stdout)
+                f.write(config)
 
     def _initdb(self) -> None:
         """Initialize the airflow metadata database."""
@@ -137,13 +165,17 @@ class Airflow(ExtensionBase):
             log_subprocess_error("airflow version", err, "airflow version failed")
             sys.exit(err.returncode)
 
-        if proc.stdout.startswith("2."):
+        # airflow may emit warnings (e.g. deprecation notices) to stdout ahead of the
+        # actual version, so only look at the last line of output.
+        version = proc.stdout.strip().splitlines()[-1]
+
+        if version.startswith("2."):
             try:
                 self.airflow_invoker.run("db", "init")
             except subprocess.CalledProcessError as err:
                 log_subprocess_error("airflow db init", err, "airflow db init failed")
                 sys.exit(err.returncode)
-        elif proc.stdout.startswith("3."):
+        elif version.startswith("3."):
             try:
                 self.airflow_invoker.run("db", "migrate")
             except subprocess.CalledProcessError as err:

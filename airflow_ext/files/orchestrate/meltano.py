@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import importlib.metadata
 import json
 import logging
 import os
@@ -13,14 +14,17 @@ import subprocess
 from collections.abc import Iterable
 
 from airflow import DAG
+from packaging.version import Version
 
 try:
-    from airflow.operators.bash_operator import BashOperator
+    from airflow.providers.standard.operators.bash import BashOperator
 except ImportError:
     from airflow.operators.bash import BashOperator
 
 from datetime import datetime, timedelta
 from pathlib import Path
+
+AIRFLOW_VERSION = Version(importlib.metadata.version("apache-airflow"))
 
 logger = logging.getLogger(__name__)
 
@@ -85,15 +89,19 @@ def _meltano_elt_generator(schedules: list) -> None:
         #
         # Because our extractors do not support date-window extraction, it serves no
         # purpose to enqueue date-chunked jobs for complete extraction window.
+        if AIRFLOW_VERSION >= Version("3.0.0"):
+            dag_kwargs = {"schedule": schedule["interval"]}
+        else:
+            dag_kwargs = {"schedule_interval": schedule["interval"]}
+
         dag = DAG(
             dag_id,
             tags=tags,
             catchup=False,
             default_args=args,
-            schedule_interval=schedule["interval"],
             max_active_runs=1,
+            **dag_kwargs,
         )
-
         elt = BashOperator(  # noqa: F841
             task_id="extract_load",
             bash_command=f"cd {PROJECT_ROOT}; {MELTANO_BIN} schedule run {schedule['name']}",
@@ -129,17 +137,21 @@ def _meltano_job_generator(schedules: list) -> None:
         common_tags = DEFAULT_TAGS.copy()
         common_tags.append(f"schedule:{schedule['name']}")
         common_tags.append(f"job:{schedule['job']['name']}")
-        interval = schedule["cron_interval"]
         args = DEFAULT_ARGS.copy()
         args["start_date"] = schedule.get("start_date", datetime(1970, 1, 1, 0, 0, 0))
+
+        if AIRFLOW_VERSION >= Version("3.0.0"):
+            dag_kwargs = {"schedule": schedule["cron_interval"]}
+        else:
+            dag_kwargs = {"schedule_interval": schedule["cron_interval"]}
 
         with DAG(
             base_id,
             tags=common_tags,
             catchup=False,
             default_args=args,
-            schedule_interval=interval,
             max_active_runs=1,
+            **dag_kwargs,
         ) as dag:
             previous_task = None
             for idx, task in enumerate(schedule["job"]["tasks"]):
@@ -182,7 +194,7 @@ def create_dags() -> None:
     )
     schedule_export = json.loads(list_result.stdout)
 
-    if schedule_export.get("schedules"):
+    if isinstance(schedule_export, dict) and schedule_export.get("schedules"):
         logger.info(f"Received meltano v2 style schedule export: {schedule_export}")
         _meltano_elt_generator(schedule_export["schedules"].get("elt"))
         _meltano_job_generator(schedule_export["schedules"].get("job"))

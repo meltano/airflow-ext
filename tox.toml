@@ -1,0 +1,24 @@
+requires = ["tox-uv"]
+env_list = [
+    "py310-airflow2",
+    "py311-airflow2",
+    "py312-airflow2",
+    "py310-airflow3",
+    "py311-airflow3",
+    "py312-airflow3",
+    "py313-airflow3",
+    "py314-airflow3",
+]
+
+[env_run_base]
+description = "run tests on Python {py_dot_ver}"
+package = "wheel"
+dependency_groups = ["test"]
+deps = [
+    { replace = "if", condition = "factor.airflow2", then = ["apache-airflow>=2.9,<3.0"], extend = true },
+    { replace = "if", condition = "factor.airflow3", then = ["apache-airflow>=3.0,<4.0"], extend = true },
+]
+set_env = { AIRFLOW_HOME = "{env_tmp_dir}/airflow_home" }
+commands = [
+    ["pytest", { replace = "posargs", default = ["tests"], extend = true }],
+]
